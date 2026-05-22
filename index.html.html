@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>연주쌤의 팩트체크 수사대</title>
     <!-- Google Fonts & Lucide Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,6 +11,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
+        /* [핵심 수정] 한국어 텍스트가 한 글자만 줄바꿈되지 않도록 단어 단위 유지 */
+        * {
+            word-break: keep-all;
+            overflow-wrap: break-word;
+        }
+
         body {
             background-color: #0f172a;
             color: #f1f5f9;
@@ -29,13 +35,6 @@
             display: flex;
         }
 
-        /* 제목 폰트 스타일 조정 (가독성 강화) */
-        .main-title {
-            font-weight: 800;
-            letter-spacing: -0.02em;
-            line-height: 1.2;
-        }
-
         /* 애니메이션 */
         .fade-in-up {
             animation: fadeInUp 0.5s ease-out forwards;
@@ -45,16 +44,18 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* 태블릿 화면 높이 제한 해제 (반응형) */
+        /* 가상 태블릿 화면 (반응형 패딩 적용을 위해 기본 CSS 패딩 제거) */
         .tablet-screen {
             background-color: #ffffff;
-            border-radius: 30px;
-            padding: 2rem;
+            border-radius: 24px;
             color: #1e293b;
             position: relative;
             display: flex;
             flex-direction: column;
             min-height: auto;
+        }
+        @media (min-width: 768px) {
+            .tablet-screen { border-radius: 30px; }
         }
 
         /* 유튜브 그래픽 비율 고정 */
@@ -62,7 +63,7 @@
             aspect-ratio: 16 / 9;
         }
 
-        /* 선택지 버튼 텍스트 줄바꿈 방지 및 가독성 */
+        /* 선택지 버튼 부드러운 전환 */
         .option-btn {
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -71,34 +72,34 @@
 <body>
 
     <!-- [1] 시작 화면 -->
-    <div id="view-start" class="app-view active flex-col items-center justify-center min-h-screen p-6">
-        <div class="max-w-2xl w-full text-center space-y-8 fade-in-up">
+    <div id="view-start" class="app-view active flex-col items-center justify-center min-h-screen p-4 md:p-6">
+        <div class="max-w-2xl w-full text-center space-y-6 md:space-y-8 fade-in-up mt-8 md:mt-0">
             
             <!-- 세련된 수사대 그래픽 -->
-            <div class="relative w-40 h-40 mx-auto flex items-center justify-center mb-4">
-                <div class="absolute inset-0 bg-blue-500 opacity-20 rounded-full blur-3xl animate-pulse"></div>
-                <div class="relative bg-slate-800 p-6 rounded-full border-4 border-slate-700 shadow-2xl z-10">
-                    <i data-lucide="shield-check" class="w-16 h-16 text-blue-400"></i>
+            <div class="relative w-32 h-32 md:w-40 md:h-40 mx-auto flex items-center justify-center mb-2 md:mb-4">
+                <div class="absolute inset-0 bg-blue-500 opacity-20 rounded-full blur-2xl md:blur-3xl animate-pulse"></div>
+                <div class="relative bg-slate-800 p-5 md:p-6 rounded-full border-4 border-slate-700 shadow-2xl z-10">
+                    <i data-lucide="shield-check" class="w-12 h-12 md:w-16 md:h-16 text-blue-400"></i>
                 </div>
-                <i data-lucide="search" class="absolute -right-2 -bottom-2 w-12 h-12 text-white bg-blue-600 p-2 rounded-full border-4 border-slate-900 z-20"></i>
+                <i data-lucide="search" class="absolute -right-2 -bottom-2 w-10 h-10 md:w-12 md:h-12 text-white bg-blue-600 p-2 md:p-2.5 rounded-full border-4 border-slate-900 z-20"></i>
             </div>
 
-            <h1 class="main-title text-4xl md:text-5xl text-white drop-shadow-md">
-                <span class="text-blue-400 block text-lg md:text-xl mb-3 font-medium tracking-widest uppercase">Truth Investigation Squad</span>
+            <h1 class="font-extrabold tracking-tight leading-tight text-3xl md:text-5xl text-white drop-shadow-md">
+                <span class="text-blue-400 block text-base md:text-xl mb-2 md:mb-3 font-semibold tracking-widest uppercase">Truth Investigation Squad</span>
                 연주쌤의 팩트체크 수사대
             </h1>
             
-            <p class="text-[15px] md:text-lg text-slate-400 bg-slate-800/30 px-6 py-6 rounded-2xl border border-slate-700/50 leading-relaxed max-w-xl mx-auto tracking-tight">
-                정보의 홍수 속에서 진실을 찾아내는 날카로운 눈을 가졌나요?<br/>
+            <p class="text-sm md:text-lg text-slate-400 bg-slate-800/40 px-5 py-5 md:px-6 md:py-6 rounded-2xl border border-slate-700/50 leading-relaxed max-w-xl mx-auto">
+                정보의 홍수 속에서 진실을 찾아내는 날카로운 눈을 가졌나요?<br class="hidden md:block"/>
                 5가지 고난도 수사 미션을 완료하고 최고의 수사관이 되어보세요.<br/>
-                <span class="text-blue-300 font-bold mt-3 block">빠른 판단은 높은 점수를, 보고서 정독은 보너스 점수(+10)를 드립니다.</span>
+                <span class="text-blue-300 font-bold mt-2 md:mt-3 block">빠른 판단은 높은 점수를, 보고서 정독은 보너스 점수(+10)를 드립니다.</span>
             </p>
 
-            <div class="flex flex-col items-center space-y-4 pt-4">
-                <input type="text" id="playerName" placeholder="수사관 이름 입력" class="w-full max-w-xs px-6 py-4 bg-slate-800 border-2 border-slate-700 rounded-2xl text-center text-xl font-bold focus:border-blue-400 focus:outline-none transition-all text-white" maxlength="10">
-                <button onclick="startGame()" class="w-full max-w-xs py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xl shadow-lg shadow-blue-900/50 transition-all flex items-center justify-center gap-2">
+            <div class="flex flex-col items-center space-y-3 pt-2 md:pt-4 w-full">
+                <input type="text" id="playerName" placeholder="수사관 이름 입력" class="w-full max-w-sm px-5 py-3 md:px-6 md:py-4 bg-slate-800 border-2 border-slate-700 rounded-xl text-center text-lg md:text-xl font-bold focus:border-blue-400 focus:outline-none transition-all text-white" maxlength="10">
+                <button onclick="startGame()" class="w-full max-w-sm py-3 md:py-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-lg md:text-xl shadow-lg shadow-blue-900/50 transition-all flex items-center justify-center gap-2">
                     <span>수사 시작하기</span>
-                    <i data-lucide="chevron-right"></i>
+                    <i data-lucide="chevron-right" class="w-5 h-5 md:w-6 md:h-6"></i>
                 </button>
             </div>
         </div>
@@ -106,95 +107,97 @@
 
     <!-- [2] 수사 진행 화면 (태블릿 UI) -->
     <div id="view-play" class="app-view flex-col min-h-screen p-4 md:p-8">
-        <div class="max-w-3xl w-full mx-auto flex-1 flex flex-col fade-in-up">
+        <div class="max-w-3xl w-full mx-auto flex-1 flex flex-col fade-in-up mt-2 md:mt-0">
             
             <!-- 헤더 -->
-            <div class="flex justify-between items-center mb-6">
+            <div class="flex justify-between items-center mb-4 md:mb-6">
                 <div class="flex flex-col">
-                    <span id="m-category" class="text-blue-400 font-bold text-xs tracking-widest">MISSION 1/5</span>
-                    <span id="m-title" class="text-2xl font-bold text-white tracking-tight">정보 제공자 수사</span>
+                    <span id="m-category" class="text-blue-400 font-bold text-[10px] md:text-xs tracking-widest">MISSION 1/5</span>
+                    <span id="m-title" class="text-xl md:text-2xl font-bold text-white tracking-tight">정보 제공자 수사</span>
                 </div>
-                <div class="flex items-center space-x-3 bg-slate-800 px-4 py-2 rounded-full border border-slate-700 shadow-inner">
-                    <i data-lucide="clock" id="t-icon" class="w-5 h-5 text-blue-400"></i>
-                    <span id="t-display" class="font-mono text-xl font-bold text-white w-16 text-right">30.0s</span>
+                <div class="flex items-center space-x-2 md:space-x-3 bg-slate-800 px-3 py-1.5 md:px-4 md:py-2 rounded-full border border-slate-700 shadow-inner">
+                    <i data-lucide="clock" id="t-icon" class="w-4 h-4 md:w-5 md:h-5 text-blue-400"></i>
+                    <span id="t-display" class="font-mono text-lg md:text-xl font-bold text-white w-12 md:w-16 text-right">30.0s</span>
                 </div>
             </div>
 
             <!-- 타임 라인 -->
-            <div class="w-full h-1.5 bg-slate-800 rounded-full mb-8 overflow-hidden">
+            <div class="w-full h-1 md:h-1.5 bg-slate-800 rounded-full mb-6 md:mb-8 overflow-hidden">
                 <div id="t-bar" class="h-full bg-blue-500 transition-all duration-100 linear" style="width: 100%;"></div>
             </div>
 
             <!-- 가상 태블릿 화면 -->
-            <div class="bg-slate-300 p-2 rounded-[2.5rem] shadow-2xl mb-8 border-4 border-slate-700">
-                <div class="tablet-screen border border-slate-200">
-                    <div class="absolute top-3 left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-400 rounded-full"></div>
+            <div class="bg-slate-300 p-2 md:p-3 rounded-[1.5rem] md:rounded-[2.5rem] shadow-2xl mb-6 md:mb-8 border-2 md:border-4 border-slate-700">
+                <div class="tablet-screen border border-slate-200 p-5 md:p-8">
+                    <div class="absolute top-2.5 md:top-3 left-1/2 -translate-x-1/2 w-1.5 h-1.5 md:w-2 md:h-2 bg-slate-400 rounded-full"></div>
                     
-                    <div class="mt-4">
-                        <h2 id="scenario" class="text-lg md:text-2xl text-slate-800 font-bold leading-snug mb-6">시나리오 로딩...</h2>
+                    <div class="mt-2 md:mt-4">
+                        <h2 id="scenario" class="text-base md:text-2xl text-slate-800 font-bold leading-relaxed mb-4 md:mb-6">시나리오 로딩...</h2>
                         
-                        <!-- 악어 유튜브 그래픽 영역 -->
+                        <!-- 시각 자료 영역 (악어 유튜브 등) -->
                         <div id="visual"></div>
                         
-                        <div class="bg-slate-50 p-4 rounded-xl flex items-start space-x-3 border border-slate-200 mt-2">
-                            <i data-lucide="search" class="w-6 h-6 text-blue-600 shrink-0 mt-0.5"></i>
-                            <p id="question" class="text-md md:text-lg text-blue-900 font-bold">질문이 표시됩니다.</p>
+                        <div class="bg-slate-50 p-3 md:p-4 rounded-xl flex items-start space-x-2 md:space-x-3 border border-slate-200 mt-2">
+                            <i data-lucide="search" class="w-5 h-5 md:w-6 md:h-6 text-blue-600 shrink-0 mt-0.5"></i>
+                            <p id="question" class="text-sm md:text-lg text-blue-900 font-bold">질문이 표시됩니다.</p>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- 선택지 (반응형으로 하단에 배치) -->
-            <div id="options" class="space-y-3 pb-12"></div>
+            <div id="options" class="space-y-2 md:space-y-3 pb-8 md:pb-12"></div>
         </div>
     </div>
 
     <!-- [3] 팩트체크 보고서 (결과) -->
     <div id="view-report" class="app-view flex-col min-h-screen p-4 md:p-8">
-        <div class="max-w-4xl w-full mx-auto space-y-6 fade-in-up">
+        <div class="max-w-4xl w-full mx-auto space-y-4 md:space-y-6 fade-in-up mt-2 md:mt-0">
             
-            <div id="r-banner" class="p-8 rounded-[2rem] border-2 flex flex-col items-center text-center shadow-lg">
-                <div id="r-icon-box" class="mb-4"></div>
-                <h2 id="r-headline" class="text-3xl font-black mb-1 tracking-tight">수사 결과</h2>
-                <p id="r-subtext" class="text-lg opacity-80">+0pt 획득</p>
+            <div id="r-banner" class="p-6 md:p-8 rounded-[1.5rem] md:rounded-[2rem] border-2 flex flex-col items-center text-center shadow-lg">
+                <div id="r-icon-box" class="mb-2 md:mb-4"></div>
+                <h2 id="r-headline" class="text-2xl md:text-3xl font-black mb-1 tracking-tight">수사 결과</h2>
+                <p id="r-subtext" class="text-sm md:text-lg opacity-80">+0pt 획득</p>
             </div>
 
-            <div class="bg-white text-slate-900 rounded-[2rem] overflow-hidden shadow-2xl">
-                <div class="bg-slate-800 px-8 py-5 border-b border-slate-700 flex items-center space-x-3">
-                    <i data-lucide="file-text" class="w-6 h-6 text-blue-400"></i>
-                    <h3 class="text-xl font-bold text-white tracking-tight">팩트체크 수사 보고서</h3>
+            <div class="bg-white text-slate-900 rounded-[1.5rem] md:rounded-[2rem] overflow-hidden shadow-2xl">
+                <div class="bg-slate-800 px-5 py-4 md:px-8 md:py-5 border-b border-slate-700 flex items-center space-x-2 md:space-x-3">
+                    <i data-lucide="file-text" class="w-5 h-5 md:w-6 md:h-6 text-blue-400"></i>
+                    <h3 class="text-lg md:text-xl font-bold text-white tracking-tight">팩트체크 수사 보고서</h3>
                 </div>
                 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 p-8 md:p-10">
-                    <div class="md:col-span-2 space-y-6">
-                        <div class="flex items-center gap-3">
-                            <div class="w-2 h-8 bg-blue-500 rounded-full"></div>
-                            <h4 class="text-xl font-bold text-slate-800">연주쌤의 수사 브리핑</h4>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 p-6 md:p-10">
+                    <!-- 왼쪽: 설명 영역 -->
+                    <div class="md:col-span-2 space-y-4 md:space-y-6">
+                        <div class="flex items-center gap-2 md:gap-3">
+                            <div class="w-1.5 h-6 md:w-2 md:h-8 bg-blue-500 rounded-full"></div>
+                            <h4 class="text-lg md:text-xl font-bold text-slate-800">연주쌤의 수사 브리핑</h4>
                         </div>
-                        <p id="r-explanation" class="text-lg text-slate-600 leading-relaxed bg-slate-50 p-6 rounded-2xl border border-slate-100 italic">설명...</p>
+                        <p id="r-explanation" class="text-sm md:text-lg text-slate-600 leading-relaxed bg-slate-50 p-4 md:p-6 rounded-xl md:rounded-2xl border border-slate-100 italic">설명...</p>
                         
-                        <div class="p-5 bg-blue-50 rounded-2xl border border-blue-100 flex items-center gap-4">
-                            <div class="bg-blue-600 p-2 rounded-lg text-white font-bold text-xs shrink-0">KEY</div>
-                            <p class="text-blue-900 font-bold"><span id="r-point">포인트</span></p>
+                        <div class="p-4 md:p-5 bg-blue-50 rounded-xl md:rounded-2xl border border-blue-100 flex items-center gap-3 md:gap-4">
+                            <div class="bg-blue-600 p-1.5 md:p-2 rounded-lg text-white font-bold text-[10px] md:text-xs shrink-0">KEY</div>
+                            <p class="text-sm md:text-base text-blue-900 font-bold"><span id="r-point">포인트</span></p>
                         </div>
                     </div>
 
-                    <div class="md:col-span-1 flex flex-col items-center justify-center bg-slate-50 p-8 rounded-3xl border border-slate-200">
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">최종 판정</p>
-                        <div class="w-36 h-36 rounded-[2rem] bg-white flex items-center justify-center border-4 border-slate-100 shadow-xl relative overflow-hidden mb-4">
+                    <!-- 오른쪽: 배지 영역 -->
+                    <div class="md:col-span-1 flex flex-col items-center justify-center bg-slate-50 p-6 md:p-8 rounded-2xl md:rounded-3xl border border-slate-200">
+                        <p class="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 md:mb-6">최종 판정</p>
+                        <div class="w-24 h-24 md:w-36 md:h-36 rounded-2xl md:rounded-[2rem] bg-white flex items-center justify-center border-2 md:border-4 border-slate-100 shadow-lg md:shadow-xl relative overflow-hidden mb-3 md:mb-4">
                             <div id="badge-bg" class="absolute inset-0 opacity-10"></div>
-                            <div id="badge-icon" class="w-24 h-24 rounded-full flex items-center justify-center text-white shadow-md z-10"></div>
+                            <div id="badge-icon" class="w-16 h-16 md:w-24 md:h-24 rounded-full flex items-center justify-center text-white shadow-md z-10"></div>
                         </div>
-                        <span id="badge-label" class="text-2xl font-black">판정 배지</span>
+                        <span id="badge-label" class="text-xl md:text-2xl font-black">판정 배지</span>
                     </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 pb-12">
-                <button onclick="nextMission(false)" class="py-5 rounded-2xl border-2 border-slate-700 font-bold text-slate-500 hover:bg-slate-800 transition-all text-lg">건너뛰기</button>
-                <button onclick="nextMission(true)" class="py-5 rounded-2xl bg-sky-600 hover:bg-sky-500 font-bold text-white shadow-xl transition-all text-lg flex flex-col items-center justify-center">
-                    <span>보고서 읽기 완료</span>
-                    <span class="text-xs text-sky-200 font-medium">+10점 보너스 획득</span>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 pt-2 md:pt-4 pb-8 md:pb-12">
+                <button onclick="nextMission(false)" class="py-3.5 md:py-5 rounded-xl md:rounded-2xl border-2 border-slate-700 font-bold text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-all text-sm md:text-lg">건너뛰기</button>
+                <button onclick="nextMission(true)" class="py-3.5 md:py-5 rounded-xl md:rounded-2xl bg-sky-600 hover:bg-sky-500 font-bold text-white shadow-xl transition-all text-sm md:text-lg flex flex-col items-center justify-center gap-0.5 md:gap-1">
+                    <span>보고서 정독 완료</span>
+                    <span class="text-[10px] md:text-xs text-sky-200 font-medium">+10점 보너스 획득</span>
                 </button>
             </div>
         </div>
@@ -202,40 +205,40 @@
 
     <!-- [4] 최종 결과 및 실시간 랭킹 -->
     <div id="view-result" class="app-view flex-col items-center min-h-screen p-4 md:p-8">
-        <div class="max-w-2xl w-full space-y-8 fade-in-up">
-            <div class="text-center space-y-4">
-                <i data-lucide="award" class="w-20 h-20 text-yellow-400 mx-auto"></i>
-                <h2 class="text-4xl font-black text-white tracking-tight">수사 종료</h2>
-                <p class="text-slate-400 text-lg">고생하셨습니다! 수사관님의 성적입니다.</p>
+        <div class="max-w-2xl w-full space-y-6 md:space-y-8 fade-in-up mt-4 md:mt-0">
+            <div class="text-center space-y-3 md:space-y-4">
+                <i data-lucide="award" class="w-16 h-16 md:w-20 md:h-20 text-yellow-400 mx-auto"></i>
+                <h2 class="text-3xl md:text-4xl font-black text-white tracking-tight">수사 종료</h2>
+                <p class="text-slate-400 text-sm md:text-lg">고생하셨습니다! 수사관님의 성적입니다.</p>
             </div>
 
-            <div class="bg-slate-800 p-10 rounded-[2.5rem] border border-slate-700 shadow-2xl relative overflow-hidden">
+            <div class="bg-slate-800 p-6 md:p-10 rounded-3xl md:rounded-[2.5rem] border border-slate-700 shadow-2xl relative overflow-hidden">
                 <div class="text-center relative z-10">
-                    <p id="res-name" class="text-blue-400 font-bold text-sm mb-2 uppercase tracking-widest">Investigator</p>
-                    <div class="text-7xl font-black text-white tracking-tighter mb-8">
-                        <span id="res-total">0</span><span class="text-2xl text-slate-500 ml-2">pt</span>
+                    <p id="res-name" class="text-blue-400 font-bold text-xs md:text-sm mb-2 uppercase tracking-widest">Investigator</p>
+                    <div class="text-5xl md:text-7xl font-black text-white tracking-tighter mb-6 md:mb-8">
+                        <span id="res-total">0</span><span class="text-lg md:text-2xl text-slate-500 ml-1 md:ml-2">pt</span>
                     </div>
-                    <div class="grid grid-cols-2 gap-4 border-t border-slate-700 pt-8">
-                        <div class="text-left"><p class="text-xs text-slate-500 mb-1">수사 점수</p><p id="res-base" class="font-bold text-white">0 pt</p></div>
-                        <div class="text-right"><p class="text-xs text-yellow-500 mb-1">보너스</p><p id="res-bonus" class="font-bold text-yellow-400">+0 pt</p></div>
+                    <div class="grid grid-cols-2 gap-4 border-t border-slate-700 pt-6 md:pt-8">
+                        <div class="text-left"><p class="text-[10px] md:text-xs text-slate-500 mb-1">수사 점수</p><p id="res-base" class="font-bold text-white text-sm md:text-base">0 pt</p></div>
+                        <div class="text-right"><p class="text-[10px] md:text-xs text-yellow-500 mb-1">보너스</p><p id="res-bonus" class="font-bold text-yellow-400 text-sm md:text-base">+0 pt</p></div>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-slate-800 rounded-3xl overflow-hidden border border-slate-700 shadow-xl">
-                <div class="bg-slate-700/50 px-6 py-4 flex justify-between items-center">
-                    <h3 class="font-bold text-white flex items-center gap-2"><i data-lucide="trophy" class="w-5 h-5 text-yellow-400"></i> 실시간 TOP 5 랭킹</h3>
-                    <span class="px-2 py-1 bg-green-500/20 text-green-400 text-[10px] font-bold rounded-full animate-pulse">RANKING UPDATED</span>
+            <div class="bg-slate-800 rounded-2xl md:rounded-3xl overflow-hidden border border-slate-700 shadow-xl">
+                <div class="bg-slate-700/50 px-5 py-3 md:px-6 md:py-4 flex justify-between items-center">
+                    <h3 class="font-bold text-white flex items-center gap-1.5 md:gap-2 text-sm md:text-base"><i data-lucide="trophy" class="w-4 h-4 md:w-5 md:h-5 text-yellow-400"></i> 실시간 TOP 5 랭킹</h3>
+                    <span class="px-2 py-0.5 md:px-2 md:py-1 bg-green-500/20 text-green-400 text-[9px] md:text-[10px] font-bold rounded-full animate-pulse">RANKING UPDATED</span>
                 </div>
                 <div id="leaderboard" class="divide-y divide-slate-700"></div>
             </div>
 
-            <button onclick="location.reload()" class="w-full py-5 rounded-2xl bg-slate-700 hover:bg-slate-600 text-white font-bold text-lg transition-all mb-12">다시 도전하기</button>
+            <button onclick="location.reload()" class="w-full py-4 md:py-5 rounded-xl md:rounded-2xl bg-slate-700 hover:bg-slate-600 text-white font-bold text-base md:text-lg transition-all mb-8 md:mb-12">다시 도전하기</button>
         </div>
     </div>
 
     <script>
-        // 1. 배지 및 문제 데이터 (제3의 변수 반영)
+        // 1. 배지 및 문제 데이터
         const B = {
             TRUE: { label: '사실', color: 'bg-green-500', text: 'text-green-500', icon: 'check-circle' },
             HALF: { label: '절반의 사실', color: 'bg-yellow-500', text: 'text-yellow-500', icon: 'alert-triangle' },
@@ -246,12 +249,12 @@
         const Q = [
             {
                 type: "정보 제공자", scenario: "SNS에서 수십만 팔로워를 가진 인플루언서가 '일주일 만에 시력이 2배 좋아지는 비약'을 발견했다며 홍보하고 있습니다.", question: "가장 먼저 확인해야 할 팩트체크 포인트는?",
-                options: ["게시물의 좋아요와 공유 수", "작성자가 안과 전문의 등 공신력 있는 전문가인지 여부", "댓글에 달린 실구매자들의 긍정적 반응"], correct: 1, badge: B.FALSE,
+                options: ["게시물의 좋아요와 공유 수", "작성자가 공신력 있는 전문가인지 여부", "댓글에 달린 실구매자들의 긍정적 반응"], correct: 1, badge: B.FALSE,
                 report: "정보 전달자의 전문성과 공신력을 확인하는 것이 수사의 기본입니다. 팔로워 수는 신뢰도를 보장하지 않습니다.", key: "작성자의 전문성 유무를 확인하세요."
             },
             {
                 type: "수치와 통계", scenario: "학원 광고: '수강생 성적 향상률 95% 달성!' (단, 최근 한 달간 매일 5시간 이상 자습한 학생 20명 대상 조사)", question: "이 통계에서 의심해야 할 맹점은 무엇인가요?",
-                options: ["조사 기간이 너무 짧음", "표본인 20명이 전체 수강생을 대표할 수 있는지 여부", "수강료가 다른 학원보다 저렴한지"], correct: 1, badge: B.M_FALSE,
+                options: ["조사 기간이 너무 짧음", "표본인 20명이 전체 수강생을 대표하는지 여부", "수강료가 다른 학원보다 저렴한지"], correct: 1, badge: B.M_FALSE,
                 report: "특정 조건의 소수만 선택해 조사한 '체리피킹' 오류입니다. 전체를 대표하지 못하는 데이터는 왜곡된 결과를 만듭니다.", key: "표본의 대표성과 조사 조건을 의심하세요."
             },
             {
@@ -297,8 +300,8 @@
             
             const vis = document.getElementById('visual'); vis.innerHTML = "";
             if(m.isYT) {
-                vis.className = "mb-6";
-                vis.innerHTML = `<div class="yt-ui yt-wrapper aspect-video relative"><img src="https://images.unsplash.com/photo-1549240923-93a2e080e653?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover opacity-60 filter contrast-125"><div class="absolute inset-0 flex items-center justify-center"><div class="bg-red-600 w-16 h-11 rounded-xl flex items-center justify-center shadow-lg"><div class="w-0 h-0 border-t-[8px] border-t-transparent border-l-[15px] border-l-white border-b-[8px] border-b-transparent ml-1"></div></div></div><div class="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black/80 to-transparent flex flex-col gap-2"><div class="w-full h-1 bg-white/20 rounded-full overflow-hidden"><div class="w-1/3 h-full bg-red-600"></div></div><div class="flex justify-between text-white text-[10px] font-bold"><span>● 제보 영상</span><span>0:03 / 0:15</span></div></div></div>`;
+                vis.className = "mb-4 md:mb-6";
+                vis.innerHTML = `<div class="yt-ui yt-wrapper aspect-video relative rounded-xl md:rounded-2xl overflow-hidden shadow-inner bg-black"><img src="https://images.unsplash.com/photo-1549240923-93a2e080e653?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover opacity-60 filter contrast-125"><div class="absolute inset-0 flex items-center justify-center"><div class="bg-red-600 w-12 h-8 md:w-16 md:h-11 rounded-lg md:rounded-xl flex items-center justify-center shadow-lg"><div class="w-0 h-0 border-t-[6px] md:border-t-[8px] border-t-transparent border-l-[10px] md:border-l-[15px] border-l-white border-b-[6px] md:border-b-[8px] border-b-transparent ml-1"></div></div></div><div class="absolute bottom-0 left-0 w-full p-3 md:p-4 bg-gradient-to-t from-black/80 to-transparent flex flex-col gap-1.5 md:gap-2"><div class="w-full h-1 bg-white/20 rounded-full overflow-hidden"><div class="w-1/3 h-full bg-red-600"></div></div><div class="flex justify-between text-white text-[9px] md:text-[10px] font-bold"><span>● 제보 영상</span><span>0:03 / 0:15</span></div></div></div>`;
             } else {
                 vis.className = "";
             }
@@ -306,8 +309,8 @@
             const optArea = document.getElementById('options'); optArea.innerHTML = "";
             m.options.forEach((o, i) => {
                 const b = document.createElement('button');
-                b.className = "option-btn w-full text-left p-5 rounded-2xl bg-slate-800 border-2 border-slate-700 hover:border-blue-400 hover:bg-slate-750 flex items-center gap-4 shadow-md text-white font-bold";
-                b.innerHTML = `<div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center shrink-0 text-blue-400">${i+1}</div><span>${o}</span>`;
+                b.className = "option-btn w-full text-left p-4 md:p-5 rounded-xl md:rounded-2xl bg-slate-800 border-2 border-slate-700 hover:border-blue-400 hover:bg-slate-750 flex items-center gap-3 md:gap-4 shadow-md text-white font-bold text-sm md:text-base";
+                b.innerHTML = `<div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-slate-700 flex items-center justify-center shrink-0 text-blue-400 text-sm md:text-base">${i+1}</div><span class="leading-snug">${o}</span>`;
                 b.onclick = () => submit(i); optArea.appendChild(b);
             });
 
@@ -329,20 +332,21 @@
             let earned = 0;
             if(ok) { earned = 500 + Math.floor(state.time * 10); state.base += earned; state.total += earned; }
 
-            document.getElementById('r-headline').innerText = ok ? "수사 성공! 진실을 발견했습니다." : "수사 실패. 함정에 빠졌습니다.";
+            document.getElementById('r-headline').innerText = ok ? "수사 성공! 진실 발견." : "수사 실패. 함정입니다.";
             document.getElementById('r-headline').className = `text-2xl md:text-3xl font-black mb-1 tracking-tight ${ok?'text-green-400':'text-red-400'}`;
-            document.getElementById('r-banner').className = `p-8 rounded-[2rem] border-2 flex flex-col items-center text-center shadow-lg ${ok?'bg-green-900/10 border-green-500/30':'bg-red-900/10 border-red-500/30'}`;
-            document.getElementById('r-icon-box').innerHTML = `<i data-lucide="${ok?'check-circle':'x-circle'}" class="w-16 h-16 ${ok?'text-green-400':'text-red-400'}"></i>`;
-            document.getElementById('r-subtext').innerText = ok ? `+${earned}pt 획득 (시간 보너스 포함)` : "점수 획득 실패";
+            document.getElementById('r-banner').className = `p-6 md:p-8 rounded-[1.5rem] md:rounded-[2rem] border-2 flex flex-col items-center text-center shadow-lg ${ok?'bg-green-900/10 border-green-500/30':'bg-red-900/10 border-red-500/30'}`;
+            document.getElementById('r-icon-box').innerHTML = `<i data-lucide="${ok?'check-circle':'x-circle'}" class="w-12 h-12 md:w-16 md:h-16 ${ok?'text-green-400':'text-red-400'}"></i>`;
+            document.getElementById('r-subtext').innerText = ok ? `+${earned}pt 획득 (시간 보너스)` : "점수 획득 실패";
+            
             document.getElementById('r-explanation').innerText = m.report;
             document.getElementById('r-point').innerText = m.key;
             
             const bad = m.badge;
             document.getElementById('badge-label').innerText = bad.label;
-            document.getElementById('badge-label').className = `text-2xl font-black ${bad.text}`;
+            document.getElementById('badge-label').className = `text-xl md:text-2xl font-black ${bad.text}`;
             document.getElementById('badge-bg').className = `absolute inset-0 opacity-10 ${bad.color}`;
-            document.getElementById('badge-icon').className = `w-20 h-20 rounded-full flex items-center justify-center shadow-md z-10 ${bad.color}`;
-            document.getElementById('badge-icon').innerHTML = `<i data-lucide="${bad.icon}" class="w-12 h-12"></i>`;
+            document.getElementById('badge-icon').className = `w-14 h-14 md:w-20 md:h-20 rounded-full flex items-center justify-center shadow-md z-10 ${bad.color}`;
+            document.getElementById('badge-icon').innerHTML = `<i data-lucide="${bad.icon}" class="w-8 h-8 md:w-12 md:h-12"></i>`;
 
             switchView('view-report');
         }
@@ -359,20 +363,21 @@
             document.getElementById('res-base').innerText = state.base + " pt";
             document.getElementById('res-bonus').innerText = "+" + state.bonus + " pt";
             
-            let ranks = JSON.parse(localStorage.getItem('fact_rank_v3') || '[]');
+            let ranks = JSON.parse(localStorage.getItem('fact_rank_final') || '[]');
             ranks.push({ n: state.name, s: state.total });
             ranks.sort((a,b) => b.s - a.s);
             ranks = ranks.slice(0, 5);
-            localStorage.setItem('fact_rank_v3', JSON.stringify(ranks));
+            localStorage.setItem('fact_rank_final', JSON.stringify(ranks));
             
             const list = document.getElementById('leaderboard'); list.innerHTML = "";
             ranks.forEach((r, i) => {
                 const isMe = r.n === state.name && r.s === state.total;
-                list.innerHTML += `<div class="flex items-center px-6 py-4 ${isMe?'bg-blue-900/30 border-l-4 border-blue-500':''}"><div class="w-10 font-black text-xl text-slate-500">${i+1}</div><div class="flex-1 font-bold text-slate-200">${r.n}</div><div class="font-mono font-black text-sky-400">${r.s} pt</div></div>`;
+                list.innerHTML += `<div class="flex items-center px-4 md:px-6 py-3 md:py-4 ${isMe?'bg-blue-900/30 border-l-4 border-blue-500':''}"><div class="w-8 md:w-10 font-black text-lg md:text-xl text-slate-500">${i+1}</div><div class="flex-1 font-bold text-slate-200 text-sm md:text-base">${r.n}</div><div class="font-mono font-black text-sky-400 text-sm md:text-base">${r.s} pt</div></div>`;
             });
             switchView('view-result');
         }
 
+        // 아이콘 렌더링
         lucide.createIcons();
     </script>
 </body>
