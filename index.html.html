@@ -211,15 +211,16 @@
         // Vercel에 올리실 때는 선생님이 직접 Firebase 콘솔에서 무료 프로젝트를 생성한 후,
         // 발급받은 'firebaseConfig' 키값들을 아래 객체에 붙여넣어 주셔야 모든 기기에서 공유가 됩니다!
         // ==========================================
-        let myFirebaseConfig ={
-    apiKey: "AIzaSyCvJZkGk85VMOEtj7LSuBdCaCWLZ9LplR0",
-    authDomain: "factcheck-game.firebaseapp.com",
-    projectId: "factcheck-game",
-    storageBucket: "factcheck-game.firebasestorage.app",
-    messagingSenderId: "486046005385",
-    appId: "1:486046005385:web:2543079ae8b00bf2306e58",
-    measurementId: "G-W73M4B206Z"
-  };
+        let myFirebaseConfig = null; 
+        /* 위의 null을 지우고 이렇게 입력하세요:
+        myFirebaseConfig = {
+            apiKey: "선생님키",
+            authDomain: "선생님키.firebaseapp.com",
+            projectId: "선생님키",
+            storageBucket: "선생님키.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:12345:web:abcd"
+        };
         */
 
         let db, auth, user, appId;
