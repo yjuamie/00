@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>연주쌤의 팩트체크 수사대</title>
+    <!-- Google Fonts & Lucide Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;700;800&display=swap" rel="stylesheet">
@@ -46,7 +47,7 @@
 </head>
 <body>
 
-    <!-- [CUSTOM ALERT MODAL] -->
+    <!-- [CUSTOM ALERT MODAL] - 중복 차단 경고창 -->
     <div id="custom-alert" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-slate-800 border border-slate-700 p-6 md:p-8 rounded-3xl max-w-sm w-full text-center space-y-4 md:space-y-6 shadow-2xl animate-fade-in-up">
             <div class="w-16 h-16 bg-rose-500/20 text-rose-500 rounded-full flex items-center justify-center mx-auto">
@@ -102,6 +103,7 @@
                     <span id="m-category" class="text-blue-400 font-bold text-[10px] md:text-xs tracking-widest">MISSION 1/5</span>
                     <span id="m-title" class="text-xl md:text-2xl font-bold text-white tracking-tight">정보 제공자 수사</span>
                 </div>
+                <!-- 타이머 영역: 글자 쪼개짐 철저 방지 -->
                 <div class="flex items-center space-x-1.5 md:space-x-3 bg-slate-800 px-3 py-1.5 md:px-4 md:py-2 rounded-full border border-slate-700 shadow-inner shrink-0">
                     <i data-lucide="clock" id="t-icon" class="w-4 h-4 md:w-5 md:h-5 text-blue-400 shrink-0"></i>
                     <span id="t-display" class="font-mono text-base md:text-xl font-bold text-white text-right whitespace-nowrap shrink-0" style="min-width: 3.5rem;">30.0s</span>
@@ -146,12 +148,26 @@
                 </div>
                 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 p-6 md:p-10">
-                    <div class="md:col-span-2 space-y-4 md:space-y-6">
+                    <div class="md:col-span-2 space-y-4 md:space-y-6 flex flex-col justify-center">
                         <div class="flex items-center gap-2 md:gap-3">
                             <div class="w-1.5 h-6 md:w-2 md:h-8 bg-blue-500 rounded-full"></div>
                             <h4 class="text-lg md:text-xl font-bold text-slate-800">연주쌤의 수사 브리핑</h4>
                         </div>
-                        <p id="r-explanation" class="text-sm md:text-lg text-slate-600 leading-relaxed bg-slate-50 p-4 md:p-6 rounded-xl md:rounded-2xl border border-slate-100 italic">설명...</p>
+                        
+                        <!-- [NEW] 정답 및 선택 표시 영역 -->
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col gap-2.5">
+                            <div class="flex items-start gap-3">
+                                <span class="px-2.5 py-1 bg-slate-200 text-slate-600 text-xs font-black rounded shrink-0 mt-0.5">나의 선택</span>
+                                <p id="r-user-choice" class="text-sm md:text-base font-bold text-slate-700">선택 내용</p>
+                            </div>
+                            <div class="w-full h-[1px] bg-slate-200 my-0.5"></div>
+                            <div class="flex items-start gap-3">
+                                <span class="px-2.5 py-1 bg-green-100 text-green-700 text-xs font-black rounded shrink-0 mt-0.5">실제 정답</span>
+                                <p id="r-correct-answer" class="text-sm md:text-base font-bold text-green-700">정답 내용</p>
+                            </div>
+                        </div>
+
+                        <p id="r-explanation" class="text-sm md:text-[17px] text-slate-600 leading-relaxed bg-white p-4 md:p-6 rounded-xl md:rounded-2xl border border-slate-100 shadow-sm italic">설명...</p>
                         
                         <div class="p-4 md:p-5 bg-blue-50 rounded-xl md:rounded-2xl border border-blue-100 flex items-center gap-3 md:gap-4">
                             <div class="bg-blue-600 p-1.5 md:p-2 rounded-lg text-white font-bold text-[10px] md:text-xs shrink-0">KEY</div>
@@ -210,7 +226,7 @@
                 <div id="leaderboard" class="divide-y divide-slate-700"></div>
             </div>
 
-            <button id="btn-restart" class="w-full py-4 md:py-5 rounded-xl md:rounded-2xl bg-slate-700 hover:bg-slate-600 text-white font-bold text-base md:text-lg transition-all mb-8 md:mb-12">새로운 이름으로 재도전</button>
+            <button id="btn-restart" class="w-full py-4 md:py-5 rounded-xl md:rounded-2xl bg-slate-700 hover:bg-slate-600 text-white font-bold text-base md:text-lg transition-all mb-8 md:mb-12">다시 도전하기</button>
         </div>
     </div>
 
@@ -218,7 +234,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, getDocs, query, where, updateDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // 파이어베이스 프로젝트 키 설정
         const firebaseConfig = {
@@ -232,11 +248,11 @@
         };
 
         let db, auth, user;
-        const gameId = 'factcheck-game'; 
+        const appId = 'factcheck-game'; 
         let globalRanks = [];
         let isFirebaseActive = false;
 
-        // --- 데이터 정의 ---
+        // --- 문제 및 배지 데이터 ---
         const B = {
             TRUE: { label: '사실', color: 'bg-green-500', text: 'text-green-500', icon: 'check-circle' },
             HALF: { label: '절반의 사실', color: 'bg-yellow-500', text: 'text-yellow-500', icon: 'alert-triangle' },
@@ -275,21 +291,12 @@
         let state = { name: "", docId: null, cur: 0, total: 0, base: 0, bonus: 0, time: 30.0, timer: null };
 
         // 뷰 전환
-        const switchView = (id) => {
+        window.switchView = function(id) {
             document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             window.scrollTo(0,0);
             lucide.createIcons();
         };
-
-        // UI 모달 컨트롤
-        const showAlert = (msg) => {
-            document.getElementById('custom-alert-text').innerText = msg;
-            document.getElementById('custom-alert').classList.remove('hidden');
-        };
-        document.getElementById('btn-close-alert').addEventListener('click', () => {
-            document.getElementById('custom-alert').classList.add('hidden');
-        });
 
         // Firebase 연동 활성화
         const initBackend = async () => {
@@ -313,22 +320,22 @@
                 console.error("Firebase 초기화 에러:", e);
                 isFirebaseActive = false;
                 const dbStatus = document.getElementById('db-status');
-                if (dbStatus) dbStatus.innerHTML = '<span class="text-rose-400">🔴 서버 연결 실패 (로컬 모드로 전환됨)</span>';
+                if (dbStatus) dbStatus.innerHTML = '<span class="text-rose-400">🔴 서버 연결 실패 (Firebase 설정 확인 필요)</span>';
             }
         };
 
-        // 실시간 랭킹 수신
+        // 실시간 5분 랭킹 수신 리스너
         function listenLeaderboard() {
             if (!user || !db) return;
-            const ref = collection(db, 'artifacts', gameId, 'public', 'data', 'live_ranking');
+            const ref = collection(db, 'artifacts', appId, 'public', 'data', 'live_ranking');
             
             onSnapshot(ref, (snapshot) => {
                 let ranks = [];
-                const fiveMinsAgo = Date.now() - (5 * 60 * 1000); // 5분
+                const fiveMinsAgo = Date.now() - (5 * 60 * 1000); // 최근 5분 이내 기록만
                 
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    // 5분 이내 기록이면서 점수가 확정된(0점 이상) 데이터만 화면에 노출
+                    // 점수가 0점 이상(확정된 기록)이면서 5분 이내의 데이터만 랭킹 노출
                     if (data.timestamp && data.timestamp > fiveMinsAgo && data.score >= 0) {
                         ranks.push(data);
                     }
@@ -340,11 +347,13 @@
                 if (document.getElementById('view-result').classList.contains('active')) {
                     renderLeaderboardUI(globalRanks);
                 }
+            }, (error) => {
+                console.error("실시간 랭킹 수신 오류:", error);
             });
         }
 
-        // [핵심] 중복 확인 및 입장 선점 로직
-        const triggerStartGame = async () => {
+        // 수사관명 중복 체크 (DB 실시간 조회 및 즉시 자리 선점)
+        window.triggerStartGame = async () => {
             const nameInput = document.getElementById('playerName').value.trim();
             if (!nameInput) {
                 showAlert("수사관 이름을 입력해 주세요!");
@@ -353,49 +362,59 @@
 
             const btnText = document.getElementById('btn-start-text');
             const btnIcon = document.getElementById('btn-start-icon');
-            btnText.innerText = "수사관 중복 검사 중...";
+            btnText.innerText = "수사관 등록 확인 중...";
             btnIcon.setAttribute('data-lucide', 'loader-2');
             btnIcon.classList.add('animate-spin');
             lucide.createIcons();
 
             if (isFirebaseActive && user && db) {
                 try {
-                    const ref = collection(db, 'artifacts', gameId, 'public', 'data', 'live_ranking');
+                    const ref = collection(db, 'artifacts', appId, 'public', 'data', 'live_ranking');
                     const snapshot = await getDocs(ref);
                     const fiveMinsAgo = Date.now() - (5 * 60 * 1000);
                     let isDuplicate = false;
 
                     snapshot.forEach(doc => {
                         const data = doc.data();
-                        // 5분 이내에 같은 이름이 존재하면 차단 (점수 무관: 진행중이든 완료든 차단)
-                        if (data.name === nameInput && data.timestamp > fiveMinsAgo) {
+                        if (data.name === nameInput && data.timestamp && data.timestamp > fiveMinsAgo) {
                             isDuplicate = true;
                         }
                     });
 
                     if (isDuplicate) {
-                        showAlert("이미 접속 중이거나 점수가 확정된 수사관입니다.\n다른 이름으로 수사를 개시해 주세요!");
+                        showAlert("이미 접속 중이거나 기록이 있는 수사관 이름입니다. 다른 이름으로 입장해 주세요!");
                         resetStartButton();
                         return;
                     }
 
-                    // 중복이 없다면 즉시 "-1"점(진행 중 상태)으로 문서를 생성하여 이름 선점
+                    // 중복이 아니면 즉시 이름 선점 (-1점으로 기록)
                     const newDocRef = await addDoc(ref, {
                         name: nameInput,
-                        score: -1, 
+                        score: -1,
                         timestamp: Date.now()
                     });
                     
-                    state.docId = newDocRef.id; // 최종 확정 시 업데이트를 위해 고유 ID 저장
+                    state.docId = newDocRef.id;
 
                 } catch (e) {
                     console.error("중복 체크 오류:", e);
                 }
+            } else {
+                // 오프라인 로컬 폴백
+                let localNames = JSON.parse(localStorage.getItem('fc_local_names') || '[]');
+                localNames = localNames.filter(x => x.time > Date.now() - 300000);
+                if (localNames.find(x => x.name === nameInput)) {
+                    showAlert("이미 사용 중인 이름입니다. (로컬 모드)");
+                    resetStartButton();
+                    return;
+                }
+                localNames.push({name: nameInput, time: Date.now()});
+                localStorage.setItem('fc_local_names', JSON.stringify(localNames));
             }
 
             resetStartButton();
             state.name = nameInput;
-            switchView('view-play');
+            window.switchView('view-play');
             loadMission();
         };
 
@@ -408,7 +427,6 @@
             lucide.createIcons();
         }
 
-        // 게임 렌더링
         function loadMission() {
             const m = Q[state.cur];
             document.getElementById('m-category').innerText = `MISSION ${state.cur+1} / 5`;
@@ -455,6 +473,7 @@
             }, 100);
         }
 
+        // 답변 제출 처리 및 보고서 화면 업데이트
         function submitAnswer(idx) {
             clearInterval(state.timer);
             const m = Q[state.cur];
@@ -462,12 +481,27 @@
             let earned = 0;
             if(ok) { earned = 500 + Math.floor(state.time * 10); state.base += earned; state.total += earned; }
 
+            // 배너 디자인 업데이트
             document.getElementById('r-headline').innerText = ok ? "수사 성공! 진실 발견." : "수사 실패. 함정입니다.";
             document.getElementById('r-headline').className = `text-2xl md:text-3xl font-black mb-1 tracking-tight ${ok?'text-green-400':'text-red-400'}`;
             document.getElementById('r-banner').className = `p-6 md:p-8 rounded-[1.5rem] md:rounded-[2rem] border-2 flex flex-col items-center text-center shadow-lg ${ok?'bg-green-900/10 border-green-500/30':'bg-red-900/10 border-red-500/30'}`;
             document.getElementById('r-icon-box').innerHTML = `<i data-lucide="${ok?'check-circle':'x-circle'}" class="w-12 h-12 md:w-16 md:h-16 ${ok?'text-green-400':'text-red-400'}"></i>`;
             document.getElementById('r-subtext').innerText = ok ? `+${earned}pt 획득 (시간 보너스)` : "점수 획득 실패";
             
+            // [NEW] 정답 비교 패널 텍스트 업데이트
+            const userChoiceText = idx === -1 ? "시간 초과 (미선택)" : m.options[idx];
+            const correctAnswerText = m.options[m.correct];
+            
+            document.getElementById('r-user-choice').innerText = userChoiceText;
+            document.getElementById('r-correct-answer').innerText = correctAnswerText;
+            
+            // 정답 여부에 따른 내 선택 텍스트 색상 및 취소선 변경
+            if(ok) {
+                document.getElementById('r-user-choice').className = "text-sm md:text-base font-bold text-green-600";
+            } else {
+                document.getElementById('r-user-choice').className = "text-sm md:text-base font-bold text-red-500 line-through decoration-2";
+            }
+
             document.getElementById('r-explanation').innerText = m.report;
             document.getElementById('r-point').innerText = m.key;
             
@@ -478,18 +512,18 @@
             document.getElementById('badge-icon').className = `w-14 h-14 md:w-20 md:h-20 rounded-full flex items-center justify-center shadow-md z-10 ${bad.color}`;
             document.getElementById('badge-icon').innerHTML = `<i data-lucide="${bad.icon}" class="w-8 h-8 md:w-12 md:h-12"></i>`;
 
-            switchView('view-report');
+            window.switchView('view-report');
         }
 
-        const nextMission = (bon) => {
+        window.nextMission = function(bon) {
             if(bon) { state.bonus += 10; state.total += 10; }
-            if(state.cur < Q.length - 1) { state.cur++; switchView('view-play'); loadMission(); }
+            if(state.cur < Q.length - 1) { state.cur++; window.switchView('view-play'); loadMission(); }
             else finalize();
         };
 
         let fallbackSessionRanks = [];
 
-        // [핵심] 점수 확정 시 업데이트 로직
+        // 점수 최종 반영 (미리 선점해둔 -1점 문서를 업데이트)
         async function finalize() {
             document.getElementById('res-name').innerText = `${state.name} Investigator`;
             document.getElementById('res-total').innerText = state.total;
@@ -498,14 +532,13 @@
             
             if (isFirebaseActive && user && db && state.docId) {
                 try {
-                    // 새로 문서를 추가하지 않고, 시작 시 선점해둔(-1점) 문서를 최종 점수로 갱신합니다.
-                    const docRef = doc(db, 'artifacts', gameId, 'public', 'data', 'live_ranking', state.docId);
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'live_ranking', state.docId);
                     await updateDoc(docRef, {
                         score: state.total,
-                        timestamp: Date.now() // 확정된 시간으로 갱신
+                        timestamp: Date.now()
                     });
                 } catch (e) {
-                    console.error("점수 업데이트 오류:", e);
+                    console.error("데이터베이스 업데이트 오류:", e);
                 }
                 renderLeaderboardUI(globalRanks);
             } else if (!isFirebaseActive) {
@@ -514,7 +547,7 @@
                 renderLeaderboardUI(fallbackSessionRanks.slice(0, 5));
             }
             
-            switchView('view-result');
+            window.switchView('view-result');
         }
 
         function renderLeaderboardUI(ranks) {
@@ -530,10 +563,22 @@
             });
         }
 
-        // 버튼 이벤트 바인딩
+        // 커스텀 알럿 제어
+        const showAlert = (msg) => {
+            document.getElementById('custom-alert-text').innerText = msg;
+            document.getElementById('custom-alert').classList.remove('hidden');
+            lucide.createIcons();
+        };
+
+        const closeAlert = () => {
+            document.getElementById('custom-alert').classList.add('hidden');
+        };
+
+        // 이벤트 리스너 바인딩
         document.getElementById('btn-start').addEventListener('click', triggerStartGame);
-        document.getElementById('btn-skip-report').addEventListener('click', () => nextMission(false));
-        document.getElementById('btn-read-report').addEventListener('click', () => nextMission(true));
+        document.getElementById('btn-close-alert').addEventListener('click', closeAlert);
+        document.getElementById('btn-skip-report').addEventListener('click', () => window.nextMission(false));
+        document.getElementById('btn-read-report').addEventListener('click', () => window.nextMission(true));
         document.getElementById('btn-restart').addEventListener('click', () => { location.reload(); });
 
         // 앱 시작 시 파이어베이스 초기화
