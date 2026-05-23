@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>연주쌤의 팩트체크 수사대</title>
-    <!-- Google Fonts & Lucide Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;700;800&display=swap" rel="stylesheet">
@@ -47,7 +46,7 @@
 </head>
 <body>
 
-    <!-- [CUSTOM ALERT MODAL] - 중복 차단 경고창 -->
+    <!-- [CUSTOM ALERT MODAL] -->
     <div id="custom-alert" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-slate-800 border border-slate-700 p-6 md:p-8 rounded-3xl max-w-sm w-full text-center space-y-4 md:space-y-6 shadow-2xl animate-fade-in-up">
             <div class="w-16 h-16 bg-rose-500/20 text-rose-500 rounded-full flex items-center justify-center mx-auto">
@@ -90,7 +89,7 @@
                     <span id="btn-start-text">수사 시작하기</span>
                     <i id="btn-start-icon" data-lucide="chevron-right" class="w-5 h-5 md:w-6 md:h-6"></i>
                 </button>
-                <div id="db-status" class="text-xs font-bold mt-2 h-4 transition-all tracking-wider">서버 연결 확인 중...</div>
+                <div id="db-status" class="text-xs font-bold mt-2 h-4 transition-all tracking-wider text-slate-500">서버 연결 확인 중...</div>
             </div>
         </div>
     </div>
@@ -103,7 +102,6 @@
                     <span id="m-category" class="text-blue-400 font-bold text-[10px] md:text-xs tracking-widest">MISSION 1/5</span>
                     <span id="m-title" class="text-xl md:text-2xl font-bold text-white tracking-tight">정보 제공자 수사</span>
                 </div>
-                <!-- 타이머 영역: 글자 쪼개짐 철저 방지 -->
                 <div class="flex items-center space-x-1.5 md:space-x-3 bg-slate-800 px-3 py-1.5 md:px-4 md:py-2 rounded-full border border-slate-700 shadow-inner shrink-0">
                     <i data-lucide="clock" id="t-icon" class="w-4 h-4 md:w-5 md:h-5 text-blue-400 shrink-0"></i>
                     <span id="t-display" class="font-mono text-base md:text-xl font-bold text-white text-right whitespace-nowrap shrink-0" style="min-width: 3.5rem;">30.0s</span>
@@ -212,7 +210,7 @@
                 <div id="leaderboard" class="divide-y divide-slate-700"></div>
             </div>
 
-            <button id="btn-restart" class="w-full py-4 md:py-5 rounded-xl md:rounded-2xl bg-slate-700 hover:bg-slate-600 text-white font-bold text-base md:text-lg transition-all mb-8 md:mb-12">다시 도전하기</button>
+            <button id="btn-restart" class="w-full py-4 md:py-5 rounded-xl md:rounded-2xl bg-slate-700 hover:bg-slate-600 text-white font-bold text-base md:text-lg transition-all mb-8 md:mb-12">새로운 이름으로 재도전</button>
         </div>
     </div>
 
@@ -220,7 +218,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // 파이어베이스 프로젝트 키 설정
         const firebaseConfig = {
@@ -234,11 +232,11 @@
         };
 
         let db, auth, user;
-        const appId = 'factcheck-game'; 
+        const gameId = 'factcheck-game'; 
         let globalRanks = [];
         let isFirebaseActive = false;
 
-        // --- 문제 및 배지 데이터 ---
+        // --- 데이터 정의 ---
         const B = {
             TRUE: { label: '사실', color: 'bg-green-500', text: 'text-green-500', icon: 'check-circle' },
             HALF: { label: '절반의 사실', color: 'bg-yellow-500', text: 'text-yellow-500', icon: 'alert-triangle' },
@@ -274,15 +272,24 @@
             }
         ];
 
-        let state = { name: "", cur: 0, total: 0, base: 0, bonus: 0, time: 30.0, timer: null };
+        let state = { name: "", docId: null, cur: 0, total: 0, base: 0, bonus: 0, time: 30.0, timer: null };
 
         // 뷰 전환
-        window.switchView = function(id) {
+        const switchView = (id) => {
             document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             window.scrollTo(0,0);
             lucide.createIcons();
         };
+
+        // UI 모달 컨트롤
+        const showAlert = (msg) => {
+            document.getElementById('custom-alert-text').innerText = msg;
+            document.getElementById('custom-alert').classList.remove('hidden');
+        };
+        document.getElementById('btn-close-alert').addEventListener('click', () => {
+            document.getElementById('custom-alert').classList.add('hidden');
+        });
 
         // Firebase 연동 활성화
         const initBackend = async () => {
@@ -306,44 +313,38 @@
                 console.error("Firebase 초기화 에러:", e);
                 isFirebaseActive = false;
                 const dbStatus = document.getElementById('db-status');
-                if (dbStatus) dbStatus.innerHTML = '<span class="text-rose-400">🔴 서버 연결 실패 (Firebase 설정 확인 필요)</span>';
+                if (dbStatus) dbStatus.innerHTML = '<span class="text-rose-400">🔴 서버 연결 실패 (로컬 모드로 전환됨)</span>';
             }
         };
 
-        // 실시간 5분 랭킹 수신 리스너
+        // 실시간 랭킹 수신
         function listenLeaderboard() {
             if (!user || !db) return;
-            const ref = collection(db, 'artifacts', appId, 'public', 'data', 'live_ranking');
+            const ref = collection(db, 'artifacts', gameId, 'public', 'data', 'live_ranking');
             
             onSnapshot(ref, (snapshot) => {
-                let nameMap = {};
-                const fiveMinsAgo = Date.now() - (5 * 60 * 1000); // 최근 5분 이내 기록만
+                let ranks = [];
+                const fiveMinsAgo = Date.now() - (5 * 60 * 1000); // 5분
                 
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    if (data.timestamp && data.timestamp > fiveMinsAgo) {
-                        // score가 -1인 경우(게임 진행 중)도 저장하여 중복 방지 기반 데이터로 활용
-                        if (!nameMap[data.name] || nameMap[data.name].score < data.score) {
-                            nameMap[data.name] = data;
-                        }
+                    // 5분 이내 기록이면서 점수가 확정된(0점 이상) 데이터만 화면에 노출
+                    if (data.timestamp && data.timestamp > fiveMinsAgo && data.score >= 0) {
+                        ranks.push(data);
                     }
                 });
                 
-                // 화면 표시용 랭킹은 0점 이상인 최종 완료자만 필터링
-                let ranks = Object.values(nameMap).filter(r => r.score >= 0);
                 ranks.sort((a, b) => b.score - a.score);
                 globalRanks = ranks.slice(0, 5);
                 
                 if (document.getElementById('view-result').classList.contains('active')) {
                     renderLeaderboardUI(globalRanks);
                 }
-            }, (error) => {
-                console.error("실시간 랭킹 수신 오류:", error);
             });
         }
 
-        // 수사관명 중복 체크 (DB 실시간 조회 및 즉시 자리 선점으로 완벽 차단)
-        window.triggerStartGame = async () => {
+        // [핵심] 중복 확인 및 입장 선점 로직
+        const triggerStartGame = async () => {
             const nameInput = document.getElementById('playerName').value.trim();
             if (!nameInput) {
                 showAlert("수사관 이름을 입력해 주세요!");
@@ -352,57 +353,49 @@
 
             const btnText = document.getElementById('btn-start-text');
             const btnIcon = document.getElementById('btn-start-icon');
-            btnText.innerText = "수사관 등록 확인 중...";
+            btnText.innerText = "수사관 중복 검사 중...";
             btnIcon.setAttribute('data-lucide', 'loader-2');
             btnIcon.classList.add('animate-spin');
             lucide.createIcons();
 
             if (isFirebaseActive && user && db) {
                 try {
-                    const ref = collection(db, 'artifacts', appId, 'public', 'data', 'live_ranking');
+                    const ref = collection(db, 'artifacts', gameId, 'public', 'data', 'live_ranking');
                     const snapshot = await getDocs(ref);
                     const fiveMinsAgo = Date.now() - (5 * 60 * 1000);
                     let isDuplicate = false;
 
                     snapshot.forEach(doc => {
                         const data = doc.data();
-                        if (data.name === nameInput && data.timestamp && data.timestamp > fiveMinsAgo) {
+                        // 5분 이내에 같은 이름이 존재하면 차단 (점수 무관: 진행중이든 완료든 차단)
+                        if (data.name === nameInput && data.timestamp > fiveMinsAgo) {
                             isDuplicate = true;
                         }
                     });
 
                     if (isDuplicate) {
-                        showAlert("최근 5분 이내에 접속했거나 이미 점수를 등록한 수사관 이름입니다. 다른 이름으로 입장해 주세요!");
+                        showAlert("이미 접속 중이거나 점수가 확정된 수사관입니다.\n다른 이름으로 수사를 개시해 주세요!");
                         resetStartButton();
                         return;
                     }
 
-                    // 중복이 아니면 즉시 이름 선점 (score: -1 로 진행 중 상태 표시)
-                    await addDoc(ref, {
+                    // 중복이 없다면 즉시 "-1"점(진행 중 상태)으로 문서를 생성하여 이름 선점
+                    const newDocRef = await addDoc(ref, {
                         name: nameInput,
-                        score: -1,
+                        score: -1, 
                         timestamp: Date.now()
                     });
+                    
+                    state.docId = newDocRef.id; // 최종 확정 시 업데이트를 위해 고유 ID 저장
 
                 } catch (e) {
                     console.error("중복 체크 오류:", e);
                 }
-            } else {
-                // 오프라인 로컬 폴백
-                let localNames = JSON.parse(localStorage.getItem('fc_local_names') || '[]');
-                localNames = localNames.filter(x => x.time > Date.now() - 300000);
-                if (localNames.find(x => x.name === nameInput)) {
-                    showAlert("이미 사용 중인 이름입니다. (로컬 모드)");
-                    resetStartButton();
-                    return;
-                }
-                localNames.push({name: nameInput, time: Date.now()});
-                localStorage.setItem('fc_local_names', JSON.stringify(localNames));
             }
 
             resetStartButton();
             state.name = nameInput;
-            window.switchView('view-play');
+            switchView('view-play');
             loadMission();
         };
 
@@ -415,6 +408,7 @@
             lucide.createIcons();
         }
 
+        // 게임 렌더링
         function loadMission() {
             const m = Q[state.cur];
             document.getElementById('m-category').innerText = `MISSION ${state.cur+1} / 5`;
@@ -484,44 +478,43 @@
             document.getElementById('badge-icon').className = `w-14 h-14 md:w-20 md:h-20 rounded-full flex items-center justify-center shadow-md z-10 ${bad.color}`;
             document.getElementById('badge-icon').innerHTML = `<i data-lucide="${bad.icon}" class="w-8 h-8 md:w-12 md:h-12"></i>`;
 
-            window.switchView('view-report');
+            switchView('view-report');
         }
 
-        window.nextMission = function(bon) {
+        const nextMission = (bon) => {
             if(bon) { state.bonus += 10; state.total += 10; }
-            if(state.cur < Q.length - 1) { state.cur++; window.switchView('view-play'); loadMission(); }
+            if(state.cur < Q.length - 1) { state.cur++; switchView('view-play'); loadMission(); }
             else finalize();
         };
 
         let fallbackSessionRanks = [];
 
+        // [핵심] 점수 확정 시 업데이트 로직
         async function finalize() {
             document.getElementById('res-name').innerText = `${state.name} Investigator`;
             document.getElementById('res-total').innerText = state.total;
             document.getElementById('res-base').innerText = state.base + " pt";
             document.getElementById('res-bonus').innerText = "+" + state.bonus + " pt";
             
-            // Firebase 실시간 점수 등록
-            if (isFirebaseActive && user && db) {
+            if (isFirebaseActive && user && db && state.docId) {
                 try {
-                    const ref = collection(db, 'artifacts', appId, 'public', 'data', 'live_ranking');
-                    await addDoc(ref, {
-                        name: state.name,
+                    // 새로 문서를 추가하지 않고, 시작 시 선점해둔(-1점) 문서를 최종 점수로 갱신합니다.
+                    const docRef = doc(db, 'artifacts', gameId, 'public', 'data', 'live_ranking', state.docId);
+                    await updateDoc(docRef, {
                         score: state.total,
-                        timestamp: Date.now()
+                        timestamp: Date.now() // 확정된 시간으로 갱신
                     });
                 } catch (e) {
-                    console.error("데이터베이스 업로드 오류:", e);
+                    console.error("점수 업데이트 오류:", e);
                 }
                 renderLeaderboardUI(globalRanks);
-            } else {
-                // 예비용 메모리 오프라인 모드
+            } else if (!isFirebaseActive) {
                 fallbackSessionRanks.push({ name: state.name, score: state.total, timestamp: Date.now() });
                 fallbackSessionRanks.sort((a,b) => b.score - a.score);
                 renderLeaderboardUI(fallbackSessionRanks.slice(0, 5));
             }
             
-            window.switchView('view-result');
+            switchView('view-result');
         }
 
         function renderLeaderboardUI(ranks) {
@@ -537,27 +530,13 @@
             });
         }
 
-        // Custom Modal Alert Logic
-        const showAlert = (msg) => {
-            document.getElementById('custom-alert-text').innerText = msg;
-            document.getElementById('custom-alert').classList.remove('hidden');
-            lucide.createIcons();
-        };
-
-        const closeAlert = () => {
-            document.getElementById('custom-alert').classList.add('hidden');
-        };
-
-        // 모듈 범위 함수 바인딩
+        // 버튼 이벤트 바인딩
         document.getElementById('btn-start').addEventListener('click', triggerStartGame);
-        document.getElementById('btn-close-alert').addEventListener('click', closeAlert);
-        document.getElementById('btn-skip-report').addEventListener('click', () => window.nextMission(false));
-        document.getElementById('btn-read-report').addEventListener('click', () => window.nextMission(true));
-        document.getElementById('btn-restart').addEventListener('click', () => {
-            location.reload();
-        });
+        document.getElementById('btn-skip-report').addEventListener('click', () => nextMission(false));
+        document.getElementById('btn-read-report').addEventListener('click', () => nextMission(true));
+        document.getElementById('btn-restart').addEventListener('click', () => { location.reload(); });
 
-        // 초기 시작 시 동작
+        // 앱 시작 시 파이어베이스 초기화
         await initBackend();
         lucide.createIcons();
     </script>
